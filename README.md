@@ -137,8 +137,3 @@ MIT License. ©️ Your Name 2025
 ```
 
 ---
-
-Let me know if you want to include:
-- 📷 Screenshot of the UI
-- 🧪 Benchmark info (e.g., search latency)
-- 🧼 Dockerfile for deployment
