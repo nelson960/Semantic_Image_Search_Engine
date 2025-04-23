@@ -134,6 +134,3 @@ MIT License. ©️ Your Name 2025
 - [Meta AI - DINOv2](https://github.com/facebookresearch/dinov2)
 - [FAISS](https://github.com/facebookresearch/faiss)
 - [Streamlit](https://streamlit.io)
-```
-
----
