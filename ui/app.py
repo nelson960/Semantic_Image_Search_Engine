@@ -18,8 +18,8 @@ from indexer.build_index import build_faiss_index
 # Constants
 API_URL = "http://localhost:8000/search/"
 DATA_DIR = project_root / "data" / "raw"
-EMB_PATH = project_root / "data" / "embeddings.npy"
-IDX_PATH = project_root / "data" / "index.faiss"
+EMB_PATH = project_root / "data" / "embeddings" / "embeddings.npy"
+IDX_PATH = project_root / "data" / "index" / "index.faiss"
 
 st.set_page_config(page_title="Semantic Image Search", layout="centered")
 st.title("🔍 DINOv2-Powered Semantic Image Search")
@@ -33,7 +33,7 @@ with search_tab:
     uploaded = st.file_uploader("", type=["jpg", "jpeg", "png"])
 
     if uploaded:
-        st.image(uploaded, caption="Query Image", use_column_width=True)
+        st.image(uploaded, caption="Query Image", use_container_width=True)
         top_k = st.slider("Number of results", 1, 10, 5)
 
         if st.button("Search"):
@@ -79,4 +79,4 @@ with setup_tab:
             batch_extract(str(DATA_DIR), str(EMB_PATH))
         with st.spinner("Building FAISS index..."):
             build_faiss_index(str(EMB_PATH), str(IDX_PATH))
-        st.success("✅ Dataset ready for search!")
+        st.success("Dataset ready for search!")

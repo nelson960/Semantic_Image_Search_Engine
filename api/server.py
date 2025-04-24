@@ -42,7 +42,7 @@ async def search_image(file: UploadFile = File(...), top_k: int = 5):
         # Perform search (embeddings_path param removed)
         results = search_similar_images(
             query_image_path=tmp_path,
-            index_path="data/index.faiss",
+            index_path="data/index/index.faiss",
             image_dir="data/raw",
             top_k=top_k
         )

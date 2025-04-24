@@ -54,7 +54,7 @@ if __name__ == "__main__":
 
     results = search_similar_images(
         query_image_path=sys.argv[1],
-        index_path="data/index.faiss",
+        index_path="data/index/index.faiss",
         image_dir="data/raw",
         top_k=5
     )

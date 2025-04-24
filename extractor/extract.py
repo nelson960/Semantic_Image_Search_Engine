@@ -8,8 +8,7 @@ device = torch.device("mps" if torch.backends.mps.is_available() else "cpu")
 
 # explicitly ask for the fast processor to avoid warnings
 processor = AutoImageProcessor.from_pretrained(
-    "facebook/dinov2-base",
-    use_fast=True,
+    "facebook/dinov2-base"
 )
 
 # load model, move to device, eval mode
