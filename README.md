@@ -1,4 +1,3 @@
-```markdown
 # 🧠 DINOv2 Semantic Image Search Engine
 
 A full-stack, modular image search engine powered by **DINOv2** vision transformers and **FAISS** for lightning-fast, semantic nearest-neighbor search. Includes:
