@@ -12,6 +12,12 @@ A modular, vision-only semantic image search engine powered by **DINOv2** vision
 - Automatic model selection, dynamic indexing
 - Full evaluation pipeline with pseudo-labeling and t-SNE visualization
 
+## 🗂 Dataset
+
+This project uses a subset of the CIFAR-10 dataset for evaluation and demonstration purposes. CIFAR-10 contains 60,000 32x32 color images in 10 different classes. The dataset was used to:
+- Extract semantic features using DINOv2 models.
+- Perform pseudo-label clustering via KMeans (unsupervised) to simulate semantic groupings.
+- Evaluate the retrieval quality by checking cluster consistency in search results.
 
 ## 📊 DINOv2 Model Comparison (Evaluation Report)
 

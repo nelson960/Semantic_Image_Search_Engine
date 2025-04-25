@@ -3,7 +3,13 @@ from PIL import Image
 from transformers import AutoImageProcessor, AutoModel
 
 # prefer CUDA, then MPS, then CPU
-device = torch.device("mps" if torch.backends.mps.is_available() else "cpu")
+
+if torch.cuda.is_available():
+    device = torch.device("cuda")          # first GPU (cuda:0)
+elif hasattr(torch.backends, "mps") and torch.backends.mps.is_available():
+    device = torch.device("mps")           # Apple Silicon
+else:
+    device = torch.device("cpu")           # fallback
 
 @torch.no_grad()
 def extract_single_image_embedding(
