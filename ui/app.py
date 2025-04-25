@@ -78,37 +78,37 @@ with search_tab:
         uploaded = st.file_uploader("", type=["jpg", "jpeg", "png"])
         if not uploaded:
             st.info("Please upload an image to search.")
-            st.stop()
+        else:
+            # only when uploaded is present do we show the image, slider & button
+            st.image(uploaded, caption="Query Image", use_container_width=True)
+            top_k = st.slider("Number of results", 1, 10, 5)
 
-        st.image(uploaded, caption="Query Image", use_container_width=True)
-        top_k = st.slider("Number of results", 1, 10, 5)
+            if st.button("Search"):
+                logger.info("Search: model=%s top_k=%d", model_name, top_k)
+                files  = {"file": (uploaded.name, uploaded.getvalue())}
+                params = {"model_name": model_name, "top_k": top_k}
+                try:
+                    resp = requests.post(API_URL, files=files, params=params, timeout=10)
+                    resp.raise_for_status()
+                    results = resp.json().get("results", [])
+                    logger.info("Received %d results", len(results))
 
-        if st.button("Search"):
-            logger.info("Search: model=%s top_k=%d", model_name, top_k)
-            files  = {"file": (uploaded.name, uploaded.getvalue())}
-            params = {"model_name": model_name, "top_k": top_k}
-            try:
-                resp = requests.post(API_URL, files=files, params=params, timeout=10)
-                resp.raise_for_status()
-                results = resp.json().get("results", [])
-                logger.info("Received %d results", len(results))
-
-                if not results:
-                    st.warning("No similar images found.")
-                else:
-                    cols = st.columns(len(results))
-                    for col, item in zip(cols, results):
-                        img_path = train_dir / item["filename"]
-                        if img_path.exists():
-                            col.image(
-                                str(img_path),
-                                caption=f"{item['filename']}\nDist={item['distance']:.2f}"
-                            )
-                        else:
-                            col.write(f"{item['filename']} not found.")
-            except Exception as e:
-                logger.error("Search failed", exc_info=True)
-                st.error(f"Search failed: {e}")
+                    if not results:
+                        st.warning("No similar images found.")
+                    else:
+                        cols = st.columns(len(results))
+                        for col, item in zip(cols, results):
+                            img_path = train_dir / item["filename"]
+                            if img_path.exists():
+                                col.image(
+                                    str(img_path),
+                                    caption=f"{item['filename']}\nDist={item['distance']:.2f}"
+                                )
+                            else:
+                                col.write(f"{item['filename']} not found.")
+                except Exception as e:
+                    logger.error("Search failed", exc_info=True)
+                    st.error(f"Search failed: {e}")
 
 # --- SETUP TAB (unchanged) ---
 with setup_tab:
