@@ -1,0 +1,73 @@
+2025-04-25 12:03:23,054 - __main__ - INFO - Loading FAISS index from data/index/dinov2-small.faiss
+2025-04-25 12:03:23,055 - __main__ - INFO - Extracting embedding for /Users/nelson/py/paper_impl/sS_VF/semantic_search/data/raw/train/train_0054.png using model facebook/dinov2-small
+2025-04-25 12:03:24,062 - __main__ - INFO - Performing search for top 5 results
+2025-04-25 12:03:24,084 - __main__ - INFO - Search complete. Found 5 results.
+2025-04-25 12:03:24,084 - __main__ - INFO - Top 5 results:
+2025-04-25 12:03:24,084 - __main__ - INFO - train_0054.png (distance: 0.0000)
+2025-04-25 12:03:24,084 - __main__ - INFO - train_0383.png (distance: 706.6849)
+2025-04-25 12:03:24,084 - __main__ - INFO - train_0830.png (distance: 721.2576)
+2025-04-25 12:03:24,084 - __main__ - INFO - train_0990.png (distance: 773.0906)
+2025-04-25 12:03:24,084 - __main__ - INFO - train_0144.png (distance: 795.9308)
+2025-04-25 12:08:34,645 - indexer.search - INFO - Loading FAISS index from data/index/dinov2-base.faiss
+2025-04-25 12:08:36,034 - indexer.search - INFO - Loading FAISS index from data/index/dinov2-base.faiss
+2025-04-25 12:09:05,623 - indexer.search - INFO - Loading FAISS index from data/index/dinov2-base.faiss
+2025-04-25 12:09:06,438 - indexer.search - INFO - Loading FAISS index from data/index/dinov2-base.faiss
+2025-04-25 12:10:25,103 - indexer.search - INFO - Loading FAISS index from data/index/dinov2-small.faiss
+2025-04-25 12:10:25,104 - indexer.search - INFO - Extracting embedding for /var/folders/rl/4p3j8hp92yn9vps4znnmsgl80000gn/T/tmpocr_8kkk.png using model facebook/dinov2-small
+2025-04-25 12:10:26,127 - indexer.search - INFO - Performing search for top 5 results
+2025-04-25 12:10:26,148 - indexer.search - INFO - Search complete. Found 5 results.
+2025-04-25 12:14:28,571 - indexer.search - INFO - Loading FAISS index from data/index/dinov2-small.faiss
+2025-04-25 12:14:28,572 - indexer.search - INFO - Extracting embedding for /var/folders/rl/4p3j8hp92yn9vps4znnmsgl80000gn/T/tmp3my_9r8j.png using model facebook/dinov2-small
+2025-04-25 12:14:29,524 - indexer.search - INFO - Performing search for top 5 results
+2025-04-25 12:14:29,544 - indexer.search - INFO - Search complete. Found 5 results.
+2025-04-25 12:28:32,378 - indexer.search - INFO - Loading FAISS index from data/index/dinov2-small.faiss
+2025-04-25 12:28:39,041 - indexer.search - INFO - Loading FAISS index from data/index/dinov2-base.faiss
+2025-04-25 12:28:39,044 - indexer.search - INFO - Extracting embedding for /var/folders/rl/4p3j8hp92yn9vps4znnmsgl80000gn/T/tmpm_73ciod.png using model facebook/dinov2-base
+2025-04-25 12:28:40,379 - indexer.search - INFO - Performing search for top 5 results
+2025-04-25 12:28:40,400 - indexer.search - INFO - Search complete. Found 5 results.
+2025-04-25 12:43:30,000 - indexer.search - INFO - Loading FAISS index from data/index/dinov2-small.faiss
+2025-04-25 12:43:30,001 - indexer.search - INFO - Extracting embedding for /var/folders/rl/4p3j8hp92yn9vps4znnmsgl80000gn/T/tmp98zrjs9s.png using model facebook/dinov2-small
+2025-04-25 12:43:31,051 - indexer.search - INFO - Performing search for top 5 results
+2025-04-25 12:43:31,072 - indexer.search - INFO - Search complete. Found 5 results.
+2025-04-25 12:46:13,203 - indexer.search - INFO - Loading FAISS index from data/index/dinov2-base.faiss
+2025-04-25 12:49:11,071 - indexer.search - INFO - Loading FAISS index from data/index/dinov2-small.faiss
+2025-04-25 12:49:11,072 - indexer.search - INFO - Extracting embedding for /var/folders/rl/4p3j8hp92yn9vps4znnmsgl80000gn/T/tmp2hi01xpb.png using model facebook/dinov2-small
+2025-04-25 12:49:12,192 - indexer.search - INFO - Performing search for top 5 results
+2025-04-25 12:49:12,214 - indexer.search - INFO - Search complete. Found 5 results.
+2025-04-25 12:51:13,231 - indexer.search - INFO - Loading FAISS index from data/index/dinov2-small.faiss
+2025-04-25 12:51:13,232 - indexer.search - INFO - Extracting embedding for /var/folders/rl/4p3j8hp92yn9vps4znnmsgl80000gn/T/tmp_rnikof7.png using model facebook/dinov2-small
+2025-04-25 12:51:14,445 - indexer.search - INFO - Performing search for top 5 results
+2025-04-25 12:51:14,467 - indexer.search - INFO - Search complete. Found 5 results.
+2025-04-25 12:59:36,664 - indexer.search - INFO - Loading FAISS index from data/index/dinov2-small.faiss
+2025-04-25 12:59:36,665 - indexer.search - INFO - Extracting embedding for /var/folders/rl/4p3j8hp92yn9vps4znnmsgl80000gn/T/tmpyl0a_pvr.png using model facebook/dinov2-small
+2025-04-25 12:59:37,624 - indexer.search - INFO - Performing search for top 5 results
+2025-04-25 12:59:37,645 - indexer.search - INFO - Search complete. Found 5 results.
+2025-04-25 13:03:38,239 - indexer.search - INFO - Loading FAISS index from data/index/dinov2-dinov2-small.faiss
+2025-04-25 13:04:26,261 - indexer.search - INFO - Loading FAISS index from data/index/dinov2-small.faiss
+2025-04-25 13:04:26,261 - indexer.search - INFO - Extracting embedding for /var/folders/rl/4p3j8hp92yn9vps4znnmsgl80000gn/T/tmpwgirmewm.png using model dinov2-small
+2025-04-25 13:04:26,494 - indexer.search - INFO - Loading FAISS index from data/index/dinov2-small.faiss
+2025-04-25 13:04:26,495 - indexer.search - INFO - Extracting embedding for /var/folders/rl/4p3j8hp92yn9vps4znnmsgl80000gn/T/tmpz2pvwv0y.png using model dinov2-small
+2025-04-25 13:04:26,692 - indexer.search - INFO - Loading FAISS index from data/index/dinov2-small.faiss
+2025-04-25 13:04:26,692 - indexer.search - INFO - Extracting embedding for /var/folders/rl/4p3j8hp92yn9vps4znnmsgl80000gn/T/tmpdu7on6o7.png using model dinov2-small
+2025-04-25 13:04:26,877 - indexer.search - INFO - Loading FAISS index from data/index/dinov2-small.faiss
+2025-04-25 13:04:26,877 - indexer.search - INFO - Extracting embedding for /var/folders/rl/4p3j8hp92yn9vps4znnmsgl80000gn/T/tmp6stib81d.png using model dinov2-small
+2025-04-25 13:04:27,061 - indexer.search - INFO - Loading FAISS index from data/index/dinov2-small.faiss
+2025-04-25 13:04:27,061 - indexer.search - INFO - Extracting embedding for /var/folders/rl/4p3j8hp92yn9vps4znnmsgl80000gn/T/tmpib_2vqe4.png using model dinov2-small
+2025-04-25 13:05:28,174 - indexer.search - INFO - Loading FAISS index from data/index/dino-v2-dinov2-small.faiss
+2025-04-25 13:05:28,975 - indexer.search - INFO - Loading FAISS index from data/index/dino-v2-dinov2-small.faiss
+2025-04-25 13:05:29,135 - indexer.search - INFO - Loading FAISS index from data/index/dino-v2-dinov2-small.faiss
+2025-04-25 13:05:29,330 - indexer.search - INFO - Loading FAISS index from data/index/dino-v2-dinov2-small.faiss
+2025-04-25 13:06:23,876 - indexer.search - INFO - Loading FAISS index from data/index/dinov2-small.faiss
+2025-04-25 13:06:23,876 - indexer.search - INFO - Extracting embedding for /var/folders/rl/4p3j8hp92yn9vps4znnmsgl80000gn/T/tmpj0ewugge.png using model dinov2-small
+2025-04-25 13:06:56,608 - indexer.search - INFO - Loading FAISS index from data/index/dinov2-small.faiss
+2025-04-25 13:06:56,609 - indexer.search - INFO - Extracting embedding for /var/folders/rl/4p3j8hp92yn9vps4znnmsgl80000gn/T/tmpsbjy6l6d.png using model facebook/dinov2-small
+2025-04-25 13:06:57,570 - indexer.search - INFO - Performing search for top 5 results
+2025-04-25 13:06:57,591 - indexer.search - INFO - Search complete. Found 5 results.
+2025-04-25 13:08:48,081 - indexer.search - INFO - Loading FAISS index from data/index/dinov2-small.faiss
+2025-04-25 13:08:48,082 - indexer.search - INFO - Extracting embedding for /var/folders/rl/4p3j8hp92yn9vps4znnmsgl80000gn/T/tmp3ju7hhu5.png using model facebook/dinov2-small
+2025-04-25 13:08:49,193 - indexer.search - INFO - Performing search for top 5 results
+2025-04-25 13:08:49,214 - indexer.search - INFO - Search complete. Found 5 results.
+2025-04-25 13:51:42,510 - indexer.search - INFO - Loading FAISS index from data/index/dinov2-base.faiss
+2025-04-25 13:51:42,512 - indexer.search - INFO - Extracting embedding for /var/folders/rl/4p3j8hp92yn9vps4znnmsgl80000gn/T/tmpfsdlpjc3.png using model facebook/dinov2-base
+2025-04-25 13:51:43,944 - indexer.search - INFO - Performing search for top 5 results
+2025-04-25 13:51:43,967 - indexer.search - INFO - Search complete. Found 5 results.

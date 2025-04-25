@@ -1,0 +1,7 @@
+paths:
+  index: "data/index/${MODEL_NAME}.faiss"
+  images: "data/raw/train/"
+  embeddings: "data/embeddings/${MODEL_NAME}.npy"
+  logs: "logs"
+api:
+  url: "http://localhost:8000/search/"

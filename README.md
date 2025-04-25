@@ -23,26 +23,27 @@ This project is a full-stack image search engine that uses **DINOv2 Vision Trans
 ## 🧱 Project Structure
 
 ```
-.
-├── api/               # FastAPI backend
+Semantic_Image_Search_Engine/
+├── api/                        # FastAPI backend
 │   └── server.py
-├── extractor/         # Feature extraction logic
-│   ├── extract.py
-│   └── extract_dataset.py
-├── indexer/           # FAISS index building + searching
+├── data/
+│   ├── raw/                    # Images for indexing (e.g., raw/train/*.png)
+│   ├── embeddings/             # DINOv2 embeddings (e.g., .npy or .pt files)
+│   └── index/                  # FAISS indexes
+├── extractor/                  # DINOv2 embedding scripts
+│   ├── extract.py              # Single image
+│   └── extract_dataset.py      # Batch extraction
+├── indexer/                    # FAISS indexing & search
 │   ├── build_index.py
 │   └── search.py
-├── ui/                # Streamlit frontend
+├── ui/                         # Streamlit frontend
 │   └── app.py
-├── utils/             # Extra tools (save CIFAR-10, visualize embeddings)
-│   └── data_save.py
-│   └── visualize.py
-├── data/              # Dataset + generated embeddings and index
-│   ├── raw/           # Image dataset
-│   ├── embeddings.npy
-│   └── index.faiss
+├── utils/                      # Helper functions
+│   └── (optional utilities)
+├── Notebooks/                  # For experiments, testing, visualizations
 ├── requirements.txt
 └── README.md
+
 ```
 
 ---

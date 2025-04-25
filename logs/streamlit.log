@@ -1,0 +1,153 @@
+2025-04-25 12:15:47,860 - INFO - Clearing all data: raw, embeddings, index
+2025-04-25 12:15:58,194 - INFO - Extracting ZIP to /Users/nelson/py/paper_impl/sS_VF/semantic_search/data/raw/train
+2025-04-25 12:16:00,913 - INFO - Extracting ZIP to /Users/nelson/py/paper_impl/sS_VF/semantic_search/data/raw/train
+2025-04-25 12:16:03,689 - INFO - Extracting ZIP to /Users/nelson/py/paper_impl/sS_VF/semantic_search/data/raw/train
+2025-04-25 12:16:03,840 - INFO - Starting extraction & indexing: model=facebook/dinov2-base
+2025-04-25 12:23:15,166 - INFO - Finished extraction & indexing: embeddings=/Users/nelson/py/paper_impl/sS_VF/semantic_search/data/embeddings/dinov2-base.npy, index=/Users/nelson/py/paper_impl/sS_VF/semantic_search/data/index/dinov2-base.faiss
+2025-04-25 12:28:30,451 - INFO - Extracting ZIP to /Users/nelson/py/paper_impl/sS_VF/semantic_search/data/raw/train
+2025-04-25 12:28:32,373 - INFO - Initiating search: model=facebook/dinov2-small, top_k=5
+2025-04-25 12:28:32,382 - ERROR - Search failed: 500 Server Error: Internal Server Error for url: http://localhost:8000/search/?model_name=facebook%2Fdinov2-small&top_k=5
+Traceback (most recent call last):
+  File "/Users/nelson/py/paper_impl/sS_VF/semantic_search/ui/app.py", line 72, in <module>
+    resp.raise_for_status()
+  File "/opt/miniconda3/envs/ml/lib/python3.12/site-packages/requests/models.py", line 1024, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 500 Server Error: Internal Server Error for url: http://localhost:8000/search/?model_name=facebook%2Fdinov2-small&top_k=5
+2025-04-25 12:28:32,386 - INFO - Extracting ZIP to /Users/nelson/py/paper_impl/sS_VF/semantic_search/data/raw/train
+2025-04-25 12:28:37,805 - INFO - Extracting ZIP to /Users/nelson/py/paper_impl/sS_VF/semantic_search/data/raw/train
+2025-04-25 12:28:39,033 - INFO - Initiating search: model=facebook/dinov2-base, top_k=5
+2025-04-25 12:28:40,401 - INFO - Search returned 5 results
+2025-04-25 12:28:40,405 - INFO - Extracting ZIP to /Users/nelson/py/paper_impl/sS_VF/semantic_search/data/raw/train
+2025-04-25 12:39:58,674 - INFO - Clearing raw, embeddings, and index directories
+2025-04-25 12:40:05,920 - INFO - Extracting ZIP into /Users/nelson/py/paper_impl/sS_VF/semantic_search/data/raw/train
+2025-04-25 12:40:07,370 - INFO - Extracting ZIP into /Users/nelson/py/paper_impl/sS_VF/semantic_search/data/raw/train
+2025-04-25 12:40:07,524 - INFO - Extract & Index started (model=facebook/dinov2-small)
+2025-04-25 12:42:55,510 - INFO - Finished Extract & Index (embeddings=/Users/nelson/py/paper_impl/sS_VF/semantic_search/data/embeddings/dinov2-small.npy, index=/Users/nelson/py/paper_impl/sS_VF/semantic_search/data/index/dinov2-small.faiss)
+2025-04-25 12:43:27,932 - INFO - Extracting ZIP into /Users/nelson/py/paper_impl/sS_VF/semantic_search/data/raw/train
+2025-04-25 12:43:29,990 - INFO - Search started (model=facebook/dinov2-small, top_k=5)
+2025-04-25 12:43:31,073 - INFO - Search returned 5 items
+2025-04-25 12:43:31,077 - INFO - Extracting ZIP into /Users/nelson/py/paper_impl/sS_VF/semantic_search/data/raw/train
+2025-04-25 12:46:11,791 - INFO - Extracting ZIP into /Users/nelson/py/paper_impl/sS_VF/semantic_search/data/raw/train
+2025-04-25 12:46:13,195 - INFO - Search started (model=facebook/dinov2-base, top_k=5)
+2025-04-25 12:46:13,208 - ERROR - Search error
+Traceback (most recent call last):
+  File "/Users/nelson/py/paper_impl/sS_VF/semantic_search/ui/app.py", line 81, in <module>
+    resp.raise_for_status()
+  File "/opt/miniconda3/envs/ml/lib/python3.12/site-packages/requests/models.py", line 1024, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 500 Server Error: Internal Server Error for url: http://localhost:8000/search/?model_name=facebook%2Fdinov2-base&top_k=5
+2025-04-25 12:46:13,212 - INFO - Extracting ZIP into /Users/nelson/py/paper_impl/sS_VF/semantic_search/data/raw/train
+2025-04-25 12:49:11,063 - INFO - Search started (model=facebook/dinov2-small, top_k=5)
+2025-04-25 12:49:12,214 - INFO - Search returned 5 items
+2025-04-25 12:51:13,224 - INFO - Search started (model=facebook/dinov2-small, top_k=5)
+2025-04-25 12:51:14,467 - INFO - Search returned 5 results
+2025-04-25 12:59:36,656 - INFO - Search started (model=facebook/dinov2-small, top_k=5)
+2025-04-25 12:59:37,646 - INFO - Search returned 5 results
+2025-04-25 13:03:38,234 - INFO - Search: model=facebook/dinov2-dinov2-small top_k=5
+2025-04-25 13:03:38,244 - ERROR - Search failed
+Traceback (most recent call last):
+  File "/Users/nelson/py/paper_impl/sS_VF/semantic_search/ui/app.py", line 92, in <module>
+    resp.raise_for_status()
+  File "/opt/miniconda3/envs/ml/lib/python3.12/site-packages/requests/models.py", line 1024, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 500 Server Error: Internal Server Error for url: http://localhost:8000/search/?model_name=facebook%2Fdinov2-dinov2-small&top_k=5
+2025-04-25 13:04:24,431 - INFO - Search: model=dinov2-small top_k=5
+2025-04-25 13:04:25,158 - INFO - Search: model=dinov2-small top_k=5
+2025-04-25 13:04:25,333 - INFO - Search: model=dinov2-small top_k=5
+2025-04-25 13:04:25,491 - INFO - Search: model=dinov2-small top_k=5
+2025-04-25 13:04:25,665 - INFO - Search: model=dinov2-small top_k=5
+2025-04-25 13:04:26,493 - ERROR - Search failed
+Traceback (most recent call last):
+  File "/Users/nelson/py/paper_impl/sS_VF/semantic_search/ui/app.py", line 92, in <module>
+    resp.raise_for_status()
+  File "/opt/miniconda3/envs/ml/lib/python3.12/site-packages/requests/models.py", line 1024, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 500 Server Error: Internal Server Error for url: http://localhost:8000/search/?model_name=dinov2-small&top_k=5
+2025-04-25 13:04:26,691 - ERROR - Search failed
+Traceback (most recent call last):
+  File "/Users/nelson/py/paper_impl/sS_VF/semantic_search/ui/app.py", line 92, in <module>
+    resp.raise_for_status()
+  File "/opt/miniconda3/envs/ml/lib/python3.12/site-packages/requests/models.py", line 1024, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 500 Server Error: Internal Server Error for url: http://localhost:8000/search/?model_name=dinov2-small&top_k=5
+2025-04-25 13:04:26,876 - ERROR - Search failed
+Traceback (most recent call last):
+  File "/Users/nelson/py/paper_impl/sS_VF/semantic_search/ui/app.py", line 92, in <module>
+    resp.raise_for_status()
+  File "/opt/miniconda3/envs/ml/lib/python3.12/site-packages/requests/models.py", line 1024, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 500 Server Error: Internal Server Error for url: http://localhost:8000/search/?model_name=dinov2-small&top_k=5
+2025-04-25 13:04:27,060 - ERROR - Search failed
+Traceback (most recent call last):
+  File "/Users/nelson/py/paper_impl/sS_VF/semantic_search/ui/app.py", line 92, in <module>
+    resp.raise_for_status()
+  File "/opt/miniconda3/envs/ml/lib/python3.12/site-packages/requests/models.py", line 1024, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 500 Server Error: Internal Server Error for url: http://localhost:8000/search/?model_name=dinov2-small&top_k=5
+2025-04-25 13:04:27,242 - ERROR - Search failed
+Traceback (most recent call last):
+  File "/Users/nelson/py/paper_impl/sS_VF/semantic_search/ui/app.py", line 92, in <module>
+    resp.raise_for_status()
+  File "/opt/miniconda3/envs/ml/lib/python3.12/site-packages/requests/models.py", line 1024, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 500 Server Error: Internal Server Error for url: http://localhost:8000/search/?model_name=dinov2-small&top_k=5
+2025-04-25 13:05:28,166 - INFO - Search: model=facebook/dino-v2-dinov2-small top_k=5
+2025-04-25 13:05:28,180 - ERROR - Search failed
+Traceback (most recent call last):
+  File "/Users/nelson/py/paper_impl/sS_VF/semantic_search/ui/app.py", line 92, in <module>
+    resp.raise_for_status()
+  File "/opt/miniconda3/envs/ml/lib/python3.12/site-packages/requests/models.py", line 1024, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 500 Server Error: Internal Server Error for url: http://localhost:8000/search/?model_name=facebook%2Fdino-v2-dinov2-small&top_k=5
+2025-04-25 13:05:28,968 - INFO - Search: model=facebook/dino-v2-dinov2-small top_k=5
+2025-04-25 13:05:28,978 - ERROR - Search failed
+Traceback (most recent call last):
+  File "/Users/nelson/py/paper_impl/sS_VF/semantic_search/ui/app.py", line 92, in <module>
+    resp.raise_for_status()
+  File "/opt/miniconda3/envs/ml/lib/python3.12/site-packages/requests/models.py", line 1024, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 500 Server Error: Internal Server Error for url: http://localhost:8000/search/?model_name=facebook%2Fdino-v2-dinov2-small&top_k=5
+2025-04-25 13:05:29,132 - INFO - Search: model=facebook/dino-v2-dinov2-small top_k=5
+2025-04-25 13:05:29,136 - ERROR - Search failed
+Traceback (most recent call last):
+  File "/Users/nelson/py/paper_impl/sS_VF/semantic_search/ui/app.py", line 92, in <module>
+    resp.raise_for_status()
+  File "/opt/miniconda3/envs/ml/lib/python3.12/site-packages/requests/models.py", line 1024, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 500 Server Error: Internal Server Error for url: http://localhost:8000/search/?model_name=facebook%2Fdino-v2-dinov2-small&top_k=5
+2025-04-25 13:05:29,328 - INFO - Search: model=facebook/dino-v2-dinov2-small top_k=5
+2025-04-25 13:05:29,332 - ERROR - Search failed
+Traceback (most recent call last):
+  File "/Users/nelson/py/paper_impl/sS_VF/semantic_search/ui/app.py", line 92, in <module>
+    resp.raise_for_status()
+  File "/opt/miniconda3/envs/ml/lib/python3.12/site-packages/requests/models.py", line 1024, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 500 Server Error: Internal Server Error for url: http://localhost:8000/search/?model_name=facebook%2Fdino-v2-dinov2-small&top_k=5
+2025-04-25 13:06:22,046 - INFO - Search: model=dinov2-small top_k=5
+2025-04-25 13:06:24,155 - ERROR - Search failed
+Traceback (most recent call last):
+  File "/Users/nelson/py/paper_impl/sS_VF/semantic_search/ui/app.py", line 92, in <module>
+    resp.raise_for_status()
+  File "/opt/miniconda3/envs/ml/lib/python3.12/site-packages/requests/models.py", line 1024, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 500 Server Error: Internal Server Error for url: http://localhost:8000/search/?model_name=dinov2-small&top_k=5
+2025-04-25 13:06:56,601 - INFO - Search started (model=facebook/dinov2-small, top_k=5)
+2025-04-25 13:06:57,592 - INFO - Search returned 5 results
+2025-04-25 13:08:48,075 - INFO - Search: model=facebook/dinov2-small top_k=5
+2025-04-25 13:08:49,215 - INFO - Received 5 results
+2025-04-25 13:10:42,252 - INFO - Clearing all data
+2025-04-25 13:14:31,126 - INFO - Extract & Index (model=facebook/dinov2-base)
+2025-04-25 13:14:46,704 - INFO - Extracting ZIP to /Users/nelson/py/paper_impl/sS_VF/semantic_search/data/raw/train
+2025-04-25 13:14:48,775 - INFO - Extracting ZIP to /Users/nelson/py/paper_impl/sS_VF/semantic_search/data/raw/train
+2025-04-25 13:14:48,927 - INFO - Extract & Index (model=facebook/dinov2-base)
+2025-04-25 13:17:26,690 - INFO - Extracting ZIP to /Users/nelson/py/paper_impl/sS_VF/semantic_search/data/raw/train
+2025-04-25 13:41:27,503 - INFO - Extract & Index (model=facebook/dinov2-base)
+2025-04-25 13:44:11,527 - INFO - Clearing all data
+2025-04-25 13:44:12,813 - INFO - Extract & Index (model=facebook/dinov2-small)
+2025-04-25 13:44:23,175 - INFO - Extracting ZIP to /Users/nelson/py/paper_impl/sS_VF/semantic_search/data/raw/train
+2025-04-25 13:44:25,700 - INFO - Extracting ZIP to /Users/nelson/py/paper_impl/sS_VF/semantic_search/data/raw/train
+2025-04-25 13:44:26,862 - INFO - Extracting ZIP to /Users/nelson/py/paper_impl/sS_VF/semantic_search/data/raw/train
+2025-04-25 13:44:27,015 - INFO - Extract & Index (model=facebook/dinov2-base)
+2025-04-25 13:51:24,246 - INFO - Done Extract & Index: /Users/nelson/py/paper_impl/sS_VF/semantic_search/data/embeddings/dinov2-base.npy, /Users/nelson/py/paper_impl/sS_VF/semantic_search/data/index/dinov2-base.faiss
+2025-04-25 13:51:42,499 - INFO - Search: model=facebook/dinov2-base top_k=5
+2025-04-25 13:51:43,968 - INFO - Received 5 results
