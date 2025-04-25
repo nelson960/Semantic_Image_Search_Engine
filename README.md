@@ -1,99 +1,73 @@
 # 🧠 DINOv2 Semantic Image Search Engine
 
-A full-stack, modular image search engine powered by **DINOv2** vision transformers and **FAISS** for lightning-fast, semantic nearest-neighbor search. Includes:
+A modular, vision-only semantic image search engine powered by **DINOv2** vision transformers and **FAISS** for efficient, semantic nearest-neighbor search.
 
-- A **FastAPI** backend (`/api/server.py`)  
-- A **Streamlit** frontend (`/ui/app.py`)  
-- Batch embedding extraction scripts (`/extractor/`)  
-- FAISS index builder & search routines (`/indexer/`)  
-- Centralized **config.yaml** for all path settings  
-- File-and-error-aware ZIP upload & directory clearing  
-- Automatic model-index discovery in the UI  
-- Comprehensive **logging** to `logs/streamlit.log` and console
+## 🚀 Project Features
 
----
+- Batch embedding extraction using DINOv2 (small, base, large models)
+- FAISS index building for efficient semantic search
+- Model comparison based on Precision@5 and Recall@5
+- Interactive Streamlit-based frontend for uploading images and retrieving similar matches
+- FastAPI backend for scalable, modular API architecture
+- Automatic model selection, dynamic indexing
+- Full evaluation pipeline with pseudo-labeling and t-SNE visualization
 
-## 📁 Project Layout
 
-```
-Semantic_Image_Search_Engine/
-├── api/                        # FastAPI backend
-│   └── server.py
-├── data/
-│   ├── raw/train/             # Extracted images (flattened)
-│   ├── embeddings/            # .npy embeddings per model
-│   └── index/                 # .faiss indexes per model
-├── extractor/                 # DINOv2 embedding scripts
-│   ├── extract.py             # single-image embedding
-│   └── extract_dataset.py     # batch extraction (loads model once!)
-├── indexer/                   # FAISS routines
-│   ├── build_index.py         # build .faiss from .npy
-│   └── search.py              # search with dimension-check & model_name
-├── ui/                        # Streamlit app
-│   └── app.py                 # front-end with config + logging + error handling
-├── config.yaml                # path templates & API URL
-├── logs/                      # streamlit & (future) server logs
-├── Notebooks/                 # experiments & prototyping
-├── requirements.txt
-└── README.md
-```
+## 📊 DINOv2 Model Comparison (Evaluation Report)
 
----
+| Model         | Precision@5 (%) | Recall@5 (%) |
+|---------------|-----------------|--------------|
+| dinov2-small  | 89.8             | 4.4          |
+| dinov2-base   | 93.8             | 4.6          |
+| dinov2-large  | 95.8             | 4.8          |
 
-## ⚙️ Configuration
+### 🔍 Observations
+- **Precision** improves consistently as model size increases.
+- **Recall** remains stable due to clustering approximation.
+- **Tradeoff**: `dinov2-large` provides best semantic retrieval at the cost of inference speed.
 
-All runtime paths are driven by **config.yaml** in the repo root.  It uses `${MODEL_NAME}` placeholders so that one file fits all models:
+![Model Comparison](reports/model_comparison.png)
 
-```yaml
-paths:
-  raw:        "data/raw"
-  images:     "data/raw/train"
-  embeddings: "data/embeddings/${MODEL_NAME}.npy"
-  index:      "data/index/${MODEL_NAME}.faiss"
-  logs:       "logs"
-api:
-  url: "http://localhost:8000/search/"
-```
-
-- **raw**: parent of the `train/` folder holding your unzipped images.  
-- **embeddings** & **index**: templates—Streamlit replaces `${MODEL_NAME}` at runtime.  
-- **logs**: where Streamlit writes `streamlit.log`.  
-- **api.url**: backend search endpoint.
-
----
 
 ## 🔧 Installation
 
-1. **Clone & create venv**  
-   ```bash
-   git clone https://github.com/nelson960/Semantic_Image_Search_Engine.git
-   cd Semantic_Image_Search_Engine
-   python -m venv .venv
-   source .venv/bin/activate
-   pip install -r requirements.txt
-   ```
+```bash
+# Clone the repository
+git clone https://github.com/nelson960/Semantic_Image_Search_Engine.git
+cd Semantic_Image_Search_Engine
 
-2. **Edit `config.yaml`** if you want to change data or log locations.
+# Create virtual environment
+python -m venv .venv
+source .venv/bin/activate  # Linux/macOS
+.venv\Scripts\activate    # Windows
+
+# Install dependencies
+pip install -r requirements.txt
+```
 
 ---
 
-## 🚀 Backend (FastAPI)
+## 🛠️ How It Works
+
+1. Upload images (ZIP) via the Streamlit UI.
+2. Extract embeddings using the selected DINOv2 model.
+3. Build a FAISS index from the extracted embeddings.
+4. Upload a query image.
+5. The system searches the FAISS index and retrieves top-K semantically similar images.
+
+---
+
+## 🔥 API Usage (FastAPI)
 
 ```bash
 uvicorn api.server:app --reload
 ```
 
-- **Endpoint**: `POST /search/?model_name=<model>&top_k=<k>`  
-- **Params**:  
-  - `model_name` (e.g. `facebook/dino-v2-small`)  
-  - `top_k` (integer, default 5)  
-- **Body**: multipart-encoded file field named `file`
-
-### cURL example
+**Example cURL Command:**
 
 ```bash
-curl -X POST "http://localhost:8000/search/?model_name=facebook/dino-v2-small&top_k=5" \
-  -F "file=@/path/to/image.jpg"
+curl -X POST "http://localhost:8000/search/?top_k=5" \
+  -F "file=@/path/to/query_image.jpg"
 ```
 
 ---
@@ -104,67 +78,33 @@ curl -X POST "http://localhost:8000/search/?model_name=facebook/dino-v2-small&to
 streamlit run ui/app.py
 ```
 
-### Tabs
-
-- **🔍 Search**  
-  - **Auto-detects** the one `.faiss` index in `data/index/` and infers  
-    `MODEL_NAME` from its filename (e.g. `dinov2-base`).  
-  - Validates “no index → error” and “no upload → info”.  
-  - Sends `model_name` and `top_k` to the API, displays top-K matches.
-
-- **🗂️ Setup Dataset**  
-  1. **Upload** a single ZIP of images → extracts *all* files  
-     (flattened) into `data/raw/train/`.  
-  2. **Clear all data** button wipes `data/raw`, `data/embeddings`, `data/index`  
-     (recreates empty folders).  
-  3. **Select model** for indexing, then **Extract & Index** →  
-     runs `batch_extract(...)` once-per-run, builds `.faiss`.
-
-### Logging & Errors
-
-- All UI events, errors, and stack traces go to `logs/streamlit.log` and stdout.  
-- User-facing errors (missing ZIP, missing index, unsupported files) show via `st.error` or `st.warning`.
-
----
-
-## 🧠 How It Works
-
-1. **Setup** tab populates **`data/raw/train/`**, builds:
-   - `.npy` embeddings via DINOv2
-   - `.faiss` index via FAISS  
-2. **Search** tab uploads a query image →  
-   DINOv2 embedding → FAISS search → returns nearest image filenames + distances →  
-   Streamlit displays them from `train/`.
+- Upload ZIP images
+- Select DINOv2 model for embedding
+- Extract and index in one click
+- Upload and search images
+- Visualize results in the UI
 
 ---
 
 ## 🔍 Use Cases
 
-- **Reverse image search**  
-- **Product similarity**  
-- **Semantic clustering & tagging**  
+- **Reverse Image Search**
+- **Product Recommendation Systems**
+- **Content-Based Image Retrieval**
+- **Semantic Clustering and Tagging**
 
 ---
 
 ## 📄 License
 
-MIT © 2025 Nelson960
+MIT License © 2025 Nelson960
 
 ---
 
 ## 🙏 Acknowledgments
 
-- [Meta AI – DINOv2](https://github.com/facebookresearch/dinov2)  
-- [FAISS](https://github.com/facebookresearch/faiss)  
-- [FastAPI](https://fastapi.tiangolo.com)  
-- [Streamlit](https://streamlit.io)  
-```
+- [Meta AI - DINOv2](https://github.com/facebookresearch/dinov2)
+- [FAISS by Facebook AI](https://github.com/facebookresearch/faiss)
+- [FastAPI](https://fastapi.tiangolo.com)
+- [Streamlit](https://streamlit.io)
 
-This README reflects:
-
-- **config.yaml**-driven paths with `${MODEL_NAME}`  
-- **Auto-detection** of model/index in the UI  
-- **Batch extraction** loading model & processor once  
-- **Comprehensive logging**  
-- **Error handling** for missing ZIPs, empty datasets, wrong model/index  
-- **cURL** example for quick API testing.
