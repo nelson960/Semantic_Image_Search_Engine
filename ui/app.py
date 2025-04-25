@@ -136,6 +136,14 @@ with search_tab:
                                     )
                                 else:
                                     col.write("❌ Not found")
+                    except requests.HTTPError as http_err:
+                        st.error(f"Search failed: {http_err}")
+                        # try to parse the server’s error message
+                        try:
+                            detail = http_err.response.json().get("detail", "")
+                        except Exception:
+                            detail = http_err.response.text
+                        st.error(f"Search failed: {detail or http_err}")
                     except Exception as e:
                         logger.error("Search failed", exc_info=True)
                         st.error(f"Search failed: {e}")

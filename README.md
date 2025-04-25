@@ -53,6 +53,7 @@ pip install -r requirements.txt
 
 ---
 
+
 ## 🛠️ How It Works
 
 1. Upload images (ZIP) via the Streamlit UI.
@@ -61,6 +62,7 @@ pip install -r requirements.txt
 4. Upload a query image.
 5. The system searches the FAISS index and retrieves top-K semantically similar images.
 
+![System Diagram](reports/system_diagram.png)
 ---
 
 ## 🔥 API Usage (FastAPI)
