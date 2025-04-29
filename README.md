@@ -1,6 +1,6 @@
 # 🧠 DINOv2 Semantic Image Search Engine
 
-A modular, vision-only semantic image search engine powered by **DINOv2** vision transformers and **FAISS** for efficient, semantic nearest-neighbor search.
+A modular, vision-centric semantic image search engine that uses **DINOv2** transformers for feature extraction and FAISS for high-speed semantic nearest-neighbor retrieval, handling images of any resolution from thumbnails to ultra-high-res.
 
 ## 🚀 Project Features
 
@@ -14,10 +14,25 @@ A modular, vision-only semantic image search engine powered by **DINOv2** vision
 
 ## 🗂 Dataset
 
-This project uses a subset of the CIFAR-10 dataset for evaluation and demonstration purposes. CIFAR-10 contains 60,000 32x32 color images in 10 different classes. The dataset was used to:
-- Extract semantic features using DINOv2 models.
-- Perform pseudo-label clustering via KMeans (unsupervised) to simulate semantic groupings.
-- Evaluate the retrieval quality by checking cluster consistency in search results.
+TThis project relies on a curated slice of CIFAR-10 and a custom COCO split for demos and evaluation. CIFAR-10 contributes 60 000 color images at 32 × 32 px across 10 classes, while the custom COCO portion supplies 1000 images per class for 81 classes at 640 × 425 px. We use these datasets to:
+
+- Generate semantic embeddings with DINOv2.  
+- Form pseudo-labels through unsupervised K-Means clustering to emulate semantic groupings.  
+- Gauge retrieval quality by verifying cluster consistency in the returned search results.
+
+## 📈 Fine-tuning
+fine-tunes a pre-trained DINOv2 ViT-base on the STL-10 data using DINO-style self-distillation, but does so with a series of memory-savvy tricks so it can run comfortably on a 16 GB
+**MacBook Pro M2 (GPU = mps):**
+
+ - **Hardware constraints first:** the script automatically chooses mps (Apple-Silicon GPU) and caps the batch-size at 8, a setting you note is “safe for 16 GB”; all other choices—from pin-memory to modest data-loader workers—are tuned to avoid out-of-memory errors while still delivering GPU acceleration.
+
+ - **Parameter-efficient fine-tuning:** every ViT weight is frozen and LoRA adapters are injected only into the QKV and MLP layers; together with a three-layer projection head, this keeps the trainable set tiny and slashes memory/compute versus full fine-tuning.
+
+ - **Multi-crop training à la DINO:** each sample produces 2 global (224 × 224) and several local (96 × 96) crops; the local crops are concatenated into a single tensor to maximize throughput on the limited GPU RAM.
+
+ - **Student–teacher setup with EMA:** the teacher backbone/head are updated by exponential moving average after every step, so the extra forward pass adds almost no memory overhead (done under torch.no_grad()).
+
+ - **Stability aids for small hardware:** gradients are clipped at 3.0, AdamW uses a modest 6 e-4 LR, and all non-LoRA parameters (LayerNorms, embeddings, etc.) are explicitly frozen to save RAM and avoid accidental updates.
 
 ## 📊 DINOv2 Model Comparison (Evaluation Report)
 
