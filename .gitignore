@@ -5,3 +5,4 @@ logs/*
 tmp/*
 *npy
 *faiss
+Notebooks/data/*
