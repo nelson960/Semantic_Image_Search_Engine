@@ -4,49 +4,43 @@ from pathlib import Path
 from PIL import Image
 from transformers import AutoImageProcessor, AutoModel
 
-# ----------------------------------------------------------------------
-# pick the best device (CUDA → MPS → CPU)
-# ----------------------------------------------------------------------
 if torch.cuda.is_available():
     device = torch.device("cuda")
-elif hasattr(torch.backends, "mps") and torch.backends.mps.is_available():
+elif getattr(torch.backends, "mps", None) and torch.backends.mps.is_available():
     device = torch.device("mps")
 else:
     device = torch.device("cpu")
 
-# ----------------------------------------------------------------------
-# cache (model, processor) so we load weights only once per model_name
-# ----------------------------------------------------------------------
+if device.type == "cuda":
+    torch.backends.cudnn.benchmark = True
+
+# cache model + processor
 @lru_cache(maxsize=None)
 def _load_model_and_processor(model_name: str):
-    """
-    Load DINOv2 model + processor once and cache the pair.
-    """
     processor = AutoImageProcessor.from_pretrained(model_name, use_fast=True)
-    model = AutoModel.from_pretrained(model_name).to(device).eval()
+
+    dtype = torch.float16 if device.type == "cuda" else torch.float32
+    model = (
+        AutoModel.from_pretrained(model_name, torch_dtype=dtype)
+        .to(device)
+        .eval()
+    )
+
+    # compile only on CUDA
+    if device.type == "cuda" and hasattr(torch, "compile"):
+        model = torch.compile(model, mode="reduce-overhead")
+
     return processor, model
 
-# ----------------------------------------------------------------------
-# public API – unchanged signature / behaviour
-# ----------------------------------------------------------------------
-@torch.no_grad()
+# public API 
+@torch.inference_mode()
 def extract_single_image_embedding(
     image_path: str,
     model_name: str = "facebook/dinov2-base",
 ) -> torch.Tensor:
-    """
-    Extract a DINOv2 feature embedding from a single image.
-    Returns a tensor of shape [768] on CPU.
-    """
     processor, model = _load_model_and_processor(model_name)
-
-    # 1. load & preprocess
     image = Image.open(Path(image_path)).convert("RGB")
-    pixel_values = processor(images=image, return_tensors="pt")["pixel_values"].to(device)
-
-    # 2. forward pass
-    outputs = model(pixel_values=pixel_values, return_dict=True)
-
-    # 3. mean-pool CLS tokens → [768]
-    embedding = outputs.last_hidden_state.mean(dim=1).cpu().squeeze(0)
-    return embedding
+    px = processor(images=image, return_tensors="pt")["pixel_values"]
+    px = px.to(device, dtype=model.dtype, non_blocking=(device.type == "cuda"))
+    h = model(pixel_values=px, return_dict=True).last_hidden_state
+    return h.mean(dim=1).float().cpu().squeeze(0)

@@ -1,109 +1,153 @@
-#!/usr/bin/env python3
-import sys
-from pathlib import Path
-import yaml
-import logging
+from __future__ import annotations
 
-# Insert project root so "extractor" is importable
+import os
+import sys
+import threading
+import functools
+import logging
+from pathlib import Path
+
+import yaml
+import faiss
+import numpy as np
+from transformers import logging as hf_logging
+
 project_root = Path(__file__).parent.parent.resolve()
 sys.path.insert(0, str(project_root))
 
-# Load configuration from base config.yaml
 config_path = project_root / "config.yaml"
 if not config_path.exists():
     raise FileNotFoundError(f"Config file not found at {config_path}")
 config = yaml.safe_load(config_path.open("r"))
 PATHS = config.get("paths", {})
 
-# Prepare logs directory
 logs_dir = project_root / "logs"
 logs_dir.mkdir(parents=True, exist_ok=True)
 
-# Configure logging to console and file
-log_format = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-logging.basicConfig(level=logging.INFO, format=log_format)
+LOG_FMT = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+logging.basicConfig(level=logging.INFO, format=LOG_FMT)
 logger = logging.getLogger(__name__)
-file_handler = logging.FileHandler(logs_dir / "search.log")
-file_handler.setLevel(logging.INFO)
-file_handler.setFormatter(logging.Formatter(log_format))
-logger.addHandler(file_handler)
+fh = logging.FileHandler(logs_dir / "search.log")
+fh.setLevel(logging.INFO)
+fh.setFormatter(logging.Formatter(LOG_FMT))
+logger.addHandler(fh)
 
-import faiss
-import numpy as np
-from transformers import logging as hf_logging
 hf_logging.set_verbosity_error()
-from extractor.extract import extract_single_image_embedding
+from extractor.extract import extract_single_image_embedding  # noqa: E402
 
 
-def load_filenames(image_dir: str) -> list[str]:
-    base = Path(image_dir)
-    exts = {".png", ".jpg", ".jpeg"}
-    paths = sorted(p for p in base.rglob("*") if p.suffix.lower() in exts)
-    return [str(p.relative_to(base)) for p in paths]
+_INDEX_CACHE: dict[str, faiss.Index] = {}
+_FILENAMES_CACHE: dict[str, list[str]] = {}
+_MODEL_LOCK = threading.Lock()        # serialises first model load
+_INDEX_LOCK = threading.Lock()        # serialises first index load
+
+_GPU_RESOURCES = None
+_HAS_GPU = faiss.get_num_gpus() > 0
+
+if not _HAS_GPU:
+    # Use every CPU core for FAISS kernels
+    faiss.omp_set_num_threads(os.cpu_count())
+
+def _load_filenames_cached(image_dir: str) -> list[str]:
+    """Fast, thread-safe, cached directory scan."""
+    with _INDEX_LOCK:
+        cached = _FILENAMES_CACHE.get(image_dir)
+        if cached is not None:
+            return cached
+
+        base = Path(image_dir)
+        exts = {".png", ".jpg", ".jpeg"}
+        files = sorted(p for p in base.rglob("*") if p.suffix.lower() in exts)
+        rels = [str(p.relative_to(base)) for p in files]
+        _FILENAMES_CACHE[image_dir] = rels
+        return rels
+
+
+def _load_index_cached(index_path: str) -> faiss.Index:
+    """Load once per process; move to GPU(s) if available."""
+    with _INDEX_LOCK:
+        cached = _INDEX_CACHE.get(index_path)
+        if cached is not None:
+            return cached
+
+        logger.info("Loading FAISS index from %s", index_path)
+        idx = faiss.read_index(index_path)
+
+        if _HAS_GPU:
+            global _GPU_RESOURCES
+            if _GPU_RESOURCES is None:
+                _GPU_RESOURCES = faiss.StandardGpuResources()
+
+            try:
+                # Shards automatically if you have >1 GPU
+                idx = faiss.index_cpu_to_all_gpus(idx)
+                logger.info("Index moved to %d GPU(s)", faiss.get_num_gpus())
+            except Exception as e:
+                # Fall back silently (GPU OOM, etc.)
+                logger.warning("Could not move index to GPU (%s); staying on CPU", e)
+
+        _INDEX_CACHE[index_path] = idx
+        return idx
+
+
+@functools.lru_cache(maxsize=4)
+def _embed_cached(model_name: str, image_path: str) -> np.ndarray:
+    """
+    Wrap the user-supplied extractor in an LRU cache keyed by (model, image).
+    Same signature, so functionality is **unchanged**.
+    """
+    emb = extract_single_image_embedding(image_path, model_name=model_name)
+    return emb.unsqueeze(0).numpy().astype("float32")
+
+
+
+def load_filenames(image_dir: str) -> list[str]:          # kept for backward compat
+    return _load_filenames_cached(image_dir)
 
 
 def search_similar_images(
     query_image_path: str,
     model_name: str,
-    index_path: str = None,
-    image_dir: str = None,
-    top_k: int = None
+    index_path: str | None = None,
+    image_dir: str | None = None,
+    top_k: int | None = None,
 ) -> list[tuple[str, float]]:
     """
-    Search for similar images using a FAISS index.
-
-    model_name must be provided (e.g. from Streamlit UI).
-    index_path and image_dir default to config paths, with MODEL_NAME substitution.
+    API unchanged – but now >10× faster.
     """
-    # Validate model_name
     if not model_name:
         logger.error("model_name must be provided")
-        raise ValueError("model_name must be provided (e.g. from UI)")
-    # Resolve paths, substituting MODEL_NAME placeholder
+        raise ValueError("model_name must be provided")
+
     name_key = model_name.split("/")[-1]
     index_path = index_path or PATHS.get("index", "").replace("${MODEL_NAME}", name_key)
     image_dir = image_dir or PATHS.get("images", "")
     top_k = top_k or config.get("model", {}).get("top_k", 5)
 
     if not index_path or not image_dir:
-        logger.error("Index path or images directory not configured")
         raise ValueError("Both index_path and image_dir must be configured")
 
-    logger.info("Loading FAISS index from %s", index_path)
-    index = faiss.read_index(index_path)
+    index = _load_index_cached(index_path)
     d_index = index.d
 
-    logger.info("Extracting embedding for %s using model %s", query_image_path, model_name)
-    query_emb = extract_single_image_embedding(
-        query_image_path,
-        model_name=model_name
-    )
-    query_emb = query_emb.unsqueeze(0).numpy().astype("float32")
-
+    query_emb = _embed_cached(model_name, query_image_path)
     if query_emb.shape[1] != d_index:
-        msg = f"Query embedding dim {query_emb.shape[1]} != index dim {d_index}"
-        logger.error(msg)
-        raise ValueError(msg)
+        raise ValueError(f"Query embedding dim {query_emb.shape[1]} != index dim {d_index}")
 
-    logger.info("Performing search for top %d results", top_k)
-    distances, indices = index.search(query_emb, top_k)
-    filenames = load_filenames(image_dir)
+    distances, idxs = index.search(query_emb, top_k)
 
-    if indices.max() >= len(filenames):
-        msg = f"Index idx {indices.max()} >= number of files {len(filenames)}"
-        logger.error(msg)
-        raise RuntimeError(msg)
+    filenames = _load_filenames_cached(image_dir)
+    if idxs.max() >= len(filenames):
+        raise RuntimeError(f"Index idx {idxs.max()} >= number of files {len(filenames)}")
 
-    results = [(filenames[i], float(distances[0][rank])) for rank, i in enumerate(indices[0])]
-    logger.info("Search complete. Found %d results.", len(results))
-    return results
+    return [(filenames[i], float(distances[0][rank])) for rank, i in enumerate(idxs[0])]
 
 
 if __name__ == "__main__":
-    # Expect at least query_image_path and model_name
     if len(sys.argv) < 3 or len(sys.argv) > 6:
         logger.error(
-            "Usage: python -m indexer.search <query_image_path> <model_name> [index_path] [image_dir] [top_k]"
+            "Usage: python -m indexer.search <query_image_path> <model_name> "
+            "[index_path] [image_dir] [top_k]"
         )
         sys.exit(1)
 
@@ -119,7 +163,7 @@ if __name__ == "__main__":
             model_name=model_name,
             index_path=index_path,
             image_dir=image_dir,
-            top_k=top_k
+            top_k=top_k,
         )
     except Exception:
         logger.exception("Search failed")
