@@ -1,88 +1,95 @@
-#!/usr/bin/env python3
-from fastapi import FastAPI, UploadFile, File, HTTPException, Query
-from fastapi.middleware.cors import CORSMiddleware
-from tempfile import NamedTemporaryFile
-from pathlib import Path
+from __future__ import annotations
 import logging
 import os
-
-# Ensure project root is importable
 import sys
+from pathlib import Path
+from tempfile import NamedTemporaryFile
+from typing import List
+from fastapi import FastAPI, File, HTTPException, Query, UploadFile
+from fastapi.concurrency import run_in_threadpool
+from fastapi.middleware.cors import CORSMiddleware
+
+
 project_root = Path(__file__).parent.parent.resolve()
 sys.path.insert(0, str(project_root))
+from indexer.search import search_similar_images 
 
-from indexer.search import search_similar_images
+# env-driven config 
+MAX_UPLOAD_MB = int(os.getenv("MAX_UPLOAD_MB", 5))
+MAX_UPLOAD_SIZE = MAX_UPLOAD_MB * 1024 * 1024
+ALLOWED_EXT: set[str] = {
+    ".png", ".jpg", ".jpeg", ".bmp", ".gif", ".tiff", ".webp"
+}
+ALLOWED_ORIGINS: List[str] = os.getenv("CORS_ORIGINS", "*").split(",")
 
-# Configure logging for the server
+# logging
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
 logger = logging.getLogger("api.server")
 
+# FastAPI & CORS
 app = FastAPI()
-
-# Allow CORS (e.g. from Streamlit UI)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # restrict in production
+    allow_origins=ALLOWED_ORIGINS,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# Upload constraints
-MAX_UPLOAD_SIZE = 5 * 1024 * 1024  # 5 MiB
-ALLOWED_EXTENSIONS = {".png", ".jpg", ".jpeg", ".bmp", ".gif", ".tiff", ".webp"}
-
+# route behaviour
 @app.post("/search/")
 async def search_image(
     file: UploadFile = File(...),
-    model_name: str = Query(..., description="DINOv2 model identifier e.g. facebook/dinov2-base"),
-    top_k: int = Query(5, ge=1, le=100, description="Number of top results to return")
+    model_name: str = Query(..., description="DINOv2 model identifier, e.g. facebook/dinov2-base"),
+    top_k: int = Query(5, ge=1, le=100, description="Number of top results"),
 ):
-    """
-    Accepts an uploaded image, runs semantic search with the specified DINOv2 model,
-    and returns the top_k matches.
-    """
+    # Trim model name (Swagger sometimes adds a trailing space)
+    model_name = model_name.strip()
+
+    # Extension & MIME validation
+    if not file.filename:
+        raise HTTPException(400, "Filename is missing in form part 'file'.")
+
     suffix = Path(file.filename).suffix.lower()
-    if suffix not in ALLOWED_EXTENSIONS:
+    if suffix not in ALLOWED_EXT:
         raise HTTPException(
-            status_code=400,
-            detail="Unsupported file extension. Allowed: PNG, JPG, JPEG, BMP, GIF, TIFF, WEBP."
+            400,
+            "Unsupported file extension; allowed: "
+            + ", ".join(x.lstrip(".").upper() for x in sorted(ALLOWED_EXT)),
         )
 
+    mime = file.content_type or ""
+    if mime and not mime.startswith("image/"):
+        logger.warning("Suspicious Content-Type %s for %s", mime, file.filename)
+        raise HTTPException(400, "Content-Type must be image/*")
+
+    # Read file
     contents = await file.read()
     if len(contents) > MAX_UPLOAD_SIZE:
-        raise HTTPException(
-            status_code=413,
-            detail=f"File too large. Maximum size is {MAX_UPLOAD_SIZE // (1024*1024)} MiB."
-        )
+        raise HTTPException(413, f"File too large; limit is {MAX_UPLOAD_MB} MiB.")
 
-    tmp_path = None
+    # Write to temp file → run search in background thread
+    tmp_path: str | None = None
     try:
-        tmp = NamedTemporaryFile(delete=False, suffix=suffix)
-        tmp_path = tmp.name
-        tmp.write(contents)
-        tmp.close()
+        with NamedTemporaryFile(delete=False, suffix=suffix) as tmp:
+            tmp.write(contents)
+            tmp_path = tmp.name
 
         logger.info("Searching with model=%s top_k=%d", model_name, top_k)
-        results = search_similar_images(
+        results = await run_in_threadpool(
+            search_similar_images,
             query_image_path=tmp_path,
             model_name=model_name,
-            top_k=top_k
+            top_k=top_k,
         )
 
-        return {
-            "results": [
-                {"filename": fn, "distance": dist}
-                for fn, dist in results
-            ]
-        }
+        return {"results": [{"filename": fn, "distance": dist} for fn, dist in results]}
 
     except HTTPException:
-        # pass through 4xx errors
         raise
     except Exception:
         logger.exception("Unexpected error during /search/")
-        raise HTTPException(status_code=500, detail="Internal server error.")
+        raise HTTPException(500, "Internal server error")
     finally:
         if tmp_path and os.path.exists(tmp_path):
             try:

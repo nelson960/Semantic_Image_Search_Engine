@@ -1,25 +1,21 @@
 """
-Key design choices
-──────────────────
-• **IterableDataset + DataLoader** ──  each worker decodes JPEGs in
+Key Ideas
+
+- IterableDataset + DataLoader ──  each worker decodes JPEGs in
   parallel while the main process/GPU runs the model.
 
-• **Unzip collate_fn** ──  avoids Python unpacking cost inside the loop
+- Unzip collate_fn ──  avoids Python unpacking cost inside the loop
   and, being a top-level function, is picklable by worker processes.
 
-• **(path, embedding) triplets + final sort** ──  DataLoader workers
+- (path, embedding) triplets + final sort ──  DataLoader workers
   deliver batches “first-finished”; sorting restores deterministic
   filename ↔ row alignment so downstream FAISS indexing works.
-
-• **_load_model_and_processor() cache** ──  weights stay resident; the
-  same function is used elsewhere so the public API is unchanged.
 """
 
 from __future__ import annotations
 import os, sys, argparse
 from pathlib import Path
 from typing import Iterable, Tuple, List
-
 import numpy as np
 import torch
 from PIL import Image, ImageFile
@@ -31,7 +27,7 @@ ImageFile.LOAD_TRUNCATED_IMAGES = True
 # Project-local import path & cached model/processor loader
 project_root = Path(__file__).parent.resolve()
 sys.path.insert(0, str(project_root))
-from extract import _load_model_and_processor  # noqa: E402
+from extract import _load_model_and_processor  
 
 # Tunables via env vars (do NOT change the public API)
 BATCH_SIZE  = int(os.getenv("BATCH_SIZE", 64))
@@ -46,7 +42,7 @@ def _unzip(batch):
 
 # Dataset that shards work evenly across DataLoader workers
 class ImageFolder(torch.utils.data.IterableDataset):
-    """Stream image files under `root`, keeping lexicographic order."""
+    """Stream image files under root, keeping lexicographic order."""
     exts = {".png", ".jpg", ".jpeg"}
 
     def __init__(self, root: Path):

@@ -1,3 +1,18 @@
+"""
+Key Ideas
+────────────
+- mmap load  – zero-copy file read; no RAM spike on 10-GB arrays.
+
+- dtype short-circuit – skip astype if already float32.
+
+- All-core CPU  – faiss.omp_set_num_threads() lets FAISS saturate
+   the memory bus on NUMA machines.
+
+- GPU fast-path – if CUDA is visible, vectors are batched into
+   GpuIndexFlatL2, then moved back to CPU so downstream code still gets
+   a plain IndexFlatL2 (portable across boxes).
+"""
+
 import numpy as np
 import faiss
 from pathlib import Path
@@ -17,8 +32,8 @@ def _load_embeddings(fp: str) -> np.ndarray:
 
 def _add_to_gpu(emb: np.ndarray, dim: int) -> faiss.IndexFlatL2:
     """
-    Build a flat L2 index on GPU, then move it back to CPU so the
-    on-disk format (and downstream behaviour) stays unchanged.
+    Build on GPU, then copy to host so the index file loads anywhere,
+    even on machines without CUDA.
     """
     res = faiss.StandardGpuResources()  # one-off initialisation
     gpu_index = faiss.GpuIndexFlatL2(res, dim)
@@ -43,10 +58,6 @@ def _add_to_cpu(emb: np.ndarray, dim: int) -> faiss.IndexFlatL2:
 
 
 def build_faiss_index(embedding_path: str, index_path: str):
-    """
-    Exactly the same API and output semantics as before,
-    but 10–50× faster on typical hardware.
-    """
     emb = _load_embeddings(embedding_path)
     dim = emb.shape[1]
 
