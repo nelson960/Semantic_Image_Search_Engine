@@ -1,0 +1,5 @@
+pytest
+pytest-cov          # coverage, optional
+ruff                # ultra-fast linter / stylistic rules :contentReference[oaicite:0]{index=0}
+black               # code formatter (we use --check to fail) :contentReference[oaicite:1]{index=1}
+
