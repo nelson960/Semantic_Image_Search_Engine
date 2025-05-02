@@ -7,7 +7,7 @@ Fully reproducible with clean MLOps integration.
 ## 🚀 Project Features
 
 - **Human-level semantics** – Leverages Meta’s DINOv2 (small/base/large) to embed images of any resolution into a rich semantic space.
-- **Sub-second retrieval at scale** – FAISS IVF-Flat index enables top‑K semantic search over millions of images in ~50 ms on a laptop.
+- **Sub-second retrieval at scale** – FAISS IVF-Flat index enables top‑K semantic search over millions of images.
 - **Scalable architecture** – FastAPI-powered backend supports batch embedding extraction, dynamic indexing, and automatic model selection.
 - **Modular evaluation** – Includes precision/recall benchmarking, t-SNE visualizations, and pseudo-labeling for performance insight.
 - **Production-ready stack** – Async FastAPI + Pydantic behind Docker Compose; all requests validated, unit-tested, and logged.
@@ -21,7 +21,7 @@ Used the **unlabeled STL-10** dataset (100k images, originally 96×96, resized t
 
 - **CIFAR-10:** 60k low-res (32×32) images across 10 classes.
 
-- **Custom MS-COCO Split:** 81 classes with 2k high-res (640×425) images per class.
+- **Custom MS-COCO Split:** 80 classes with 2k high-res (640×425) images per class.
 
 - **Misc. high-res sets:** Natural images for qualitative checks.
 
