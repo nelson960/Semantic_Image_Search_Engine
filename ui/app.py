@@ -1,6 +1,3 @@
-#!/usr/bin/env python3
-# ui/app.py
-
 import sys
 import logging
 import yaml
@@ -75,16 +72,13 @@ st.markdown(
 
 search_tab, setup_tab = st.tabs(["🔍 Search", "🗂️ Setup Dataset"])
 
-
-# --- SEARCH TAB ---
+# --- SEARCH TAB 
 with search_tab:
     st.markdown('<div class="bg-white shadow-md rounded-lg p-6">', unsafe_allow_html=True)
     st.subheader("Query Image")
-    st.markdown(
-        "Uploads your query image, Detects similar images"
-    )
+    st.markdown("Uploads your query image, Detects similar images")
 
-    # find indexes
+    # ——— locate FAISS index ———
     idx_dir     = project_root / Path(index_tmpl).parent
     faiss_files = list(idx_dir.glob("*.faiss"))
 
@@ -92,62 +86,73 @@ with search_tab:
         st.error("⚠️ No FAISS index found. Build one in **Setup Dataset** first.")
     else:
         if len(faiss_files) > 1:
-            st.warning(
-                f"Multiple indexes detected—using `{faiss_files[0].name}`."
-            )
+            st.warning(f"Multiple indexes detected—using `{faiss_files[0].name}`.")
         idx_path   = faiss_files[0]
-        model_key  = idx_path.stem                    # "dinov2-small"
+        model_key  = idx_path.stem
         model_name = f"facebook/{model_key}"
         st.info(f"**{model_key}**")
 
-        uploaded = st.file_uploader("📂 Select an image", type=["jpg","jpeg","png"])
+        uploaded = st.file_uploader("📂 Select an image", type=["jpg", "jpeg", "png"])
         if uploaded:
-            cols = st.columns([2,1], gap="large")
-            with cols[0]:
-                st.image(uploaded, use_container_width=True,
-                         caption="Query image preview")
-            with cols[1]:
-                top_k = st.slider("Top K results", 1, 10, 5)
-                if st.button("Search"):
-                    logger.info("Search: model=%s, top_k=%d", model_name, top_k)
-                    try:
-                        resp = requests.post(
-                            API_URL,
-                            files={"file": (uploaded.name, uploaded.getvalue())},
-                            params={"model_name": model_name, "top_k": top_k},
-                            timeout=10
-                        )
-                        resp.raise_for_status()
-                        results = resp.json().get("results", [])
-                        logger.info("Received %d results", len(results))
 
-                        if not results:
-                            st.warning("No similar images found.")
-                        else:
-                            st.subheader("🔎 Results")
-                            res_cols = st.columns(len(results), gap="medium")
-                            for col, item in zip(res_cols, results):
+            # ── preview + controls (single row)
+            #     ratio 1 : 1 + small gap  → slider moves closer to preview
+            ctrl_cols = st.columns([1, 1], gap="small")
+            with ctrl_cols[0]:
+                st.image(uploaded, width=300, caption="Query preview")   # bigger preview
+            with ctrl_cols[1]:
+                top_k = st.select_slider("Number of results", options=list(range(1,21)), value=10)
+                do_search = st.button("Search")
+
+            # ── run search
+            if do_search:
+                logger.info("Search: model=%s, top_k=%d", model_name, top_k)
+                try:
+                    resp = requests.post(
+                        API_URL,
+                        files={"file": (uploaded.name, uploaded.getvalue())},
+                        params={"model_name": model_name, "top_k": top_k},
+                        timeout=10
+                    )
+                    resp.raise_for_status()
+                    results = resp.json().get("results", [])
+                    logger.info("Received %d results", len(results))
+
+                    if not results:
+                        st.warning("No similar images found.")
+                    else:
+                        st.subheader("🔎 Results")
+
+                        # layout constants  (preview > thumb size)
+                        THUMBS_PER_ROW = 4      # thumbnails per row
+                        THUMB_WIDTH    = 350    # px  (smaller than preview)
+                        ROW_GAP_HTML   = "<div style='height:0.75rem'></div>"
+
+                        # grid without preview duplication
+                        for start in range(0, len(results), THUMBS_PER_ROW):
+                            row_cols = st.columns(THUMBS_PER_ROW, gap="medium")
+                            for col, item in zip(row_cols, results[start:start + THUMBS_PER_ROW]):
                                 img_path = train_dir / item["filename"]
                                 if img_path.exists():
-                                    col.image(
-                                        str(img_path),
-                                        use_container_width=True,
-                                        #caption=f"{item['filename']}\nDist={item['distance']:.2f}"
-                                    )
+                                    col.image(str(img_path), width=THUMB_WIDTH)
                                 else:
                                     col.write("❌ Not found")
-                    except requests.HTTPError as http_err:
-                        st.error(f"Search failed: {http_err}")
-                        # try to parse the server’s error message
-                        try:
-                            detail = http_err.response.json().get("detail", "")
-                        except Exception:
-                            detail = http_err.response.text
-                        st.error(f"Search failed: {detail or http_err}")
-                    except Exception as e:
-                        logger.error("Search failed", exc_info=True)
-                        st.error(f"Search failed: {e}")
+                            st.markdown(ROW_GAP_HTML, unsafe_allow_html=True)
+
+                # ——— unchanged error handling ———
+                except requests.HTTPError as http_err:
+                    st.error(f"Search failed: {http_err}")
+                    try:
+                        detail = http_err.response.json().get("detail", "")
+                    except Exception:
+                        detail = http_err.response.text
+                    st.error(f"Search failed: {detail or http_err}")
+                except Exception as e:
+                    logger.error("Search failed", exc_info=True)
+                    st.error(f"Search failed: {e}")
+
     st.markdown('</div>', unsafe_allow_html=True)
+
 
 
 # --- SETUP TAB ---
