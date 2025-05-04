@@ -102,6 +102,8 @@ curl -X POST "http://localhost:8000/search/?top_k=5" \
 4. Upload a query image.
 5. The system searches the FAISS index and retrieves top-K semantically similar images.
 
+<video src="reports/DinoV2.mp4" width="640" controls></video>
+
 ![System Diagram](reports/system_diagram.png)
 ---
 
